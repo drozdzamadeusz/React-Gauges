@@ -60,6 +60,129 @@ const drawScaleLabels = (
   ctx.closePath();
 };
 
+const drawFancyPointer = (
+  ctx: CanvasRenderingContext2D,
+  rotation_deg: number
+) => {
+  ctx.save();
+  const width = WIDTH / 2;
+  const height = HEIHGT / 2;
+
+  const w_0 = 0.08;
+  const w_1 = 0.004;
+  const w_2 = 0.018;
+  const w_3 = 0.09;
+
+  const h_0 = 0.18;
+  const h_1 = 0.15;
+  const h_2 = 0;
+  const h_3 = 0.24;
+
+  const offset_h = height * 0.2;
+
+  var rotation_center_point = { x: width, y: height };
+
+  ctx.translate(rotation_center_point.x, rotation_center_point.y);
+
+  const base_rataion = 180;
+
+  const roration_degrees = base_rataion + rotation_deg;
+  const rotatnio_radians = (roration_degrees * Math.PI) / 180;
+
+  ctx.rotate(rotatnio_radians);
+
+  ctx.translate(-rotation_center_point.x, -rotation_center_point.y);
+
+  ctx.fillStyle = "#ff0000";
+  ctx.strokeStyle = "#cb7272";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+
+  ctx.beginPath();
+  ctx.moveTo(width, 0 + offset_h);
+  ctx.lineTo(width + width * w_0, height * h_0 + offset_h);
+  ctx.stroke();
+  ctx.closePath();
+
+  ctx.beginPath();
+  ctx.moveTo(width + width * w_0, height * h_0 + offset_h);
+  ctx.lineTo(width + width * w_1, height * h_1 + offset_h);
+  ctx.stroke();
+  ctx.closePath();
+
+  ctx.beginPath();
+  ctx.moveTo(width + width * w_1, height * h_1 + offset_h);
+  ctx.lineTo(width + width * w_2, height - height * h_2);
+  ctx.stroke();
+  ctx.closePath();
+
+  ctx.beginPath();
+  ctx.moveTo(width + width * w_2, height - height * h_2);
+  ctx.lineTo(width + width * w_3, height + height * h_3);
+  ctx.stroke();
+  ctx.closePath();
+
+  ctx.beginPath();
+  ctx.moveTo(width + width * w_3, height + height * h_3);
+  ctx.lineTo(width - width * w_3, height + height * h_3);
+  ctx.stroke();
+  ctx.closePath();
+
+  ctx.beginPath();
+  ctx.moveTo(width - width * w_3, height + height * h_3);
+  ctx.lineTo(width - width * w_2, height - height * h_2);
+  ctx.stroke();
+  ctx.closePath();
+
+  ctx.beginPath();
+  ctx.moveTo(width - width * w_2, height - height * h_2);
+  ctx.lineTo(width - width * w_1, height * h_1 + offset_h);
+  ctx.stroke();
+  ctx.closePath();
+
+  ctx.beginPath();
+  ctx.moveTo(width - width * w_1, height * h_1 + offset_h);
+  ctx.lineTo(width - width * w_0, height * h_0 + offset_h);
+  ctx.stroke();
+  ctx.closePath();
+
+  ctx.beginPath();
+  ctx.moveTo(width - width * w_0, height * h_0 + offset_h);
+  ctx.lineTo(width, 0 + offset_h);
+  ctx.stroke();
+  ctx.closePath();
+
+  ctx.beginPath();
+  ctx.moveTo(width, 0 + offset_h);
+
+  ctx.lineTo(width + width * w_0, height * h_0 + offset_h);
+  ctx.lineTo(width + width * w_1, height * h_1 + offset_h);
+  ctx.lineTo(width + width * w_2, height - height * h_2);
+  ctx.lineTo(width + width * w_3, height + height * h_3);
+
+  ctx.lineTo(width - width * w_3, height + height * h_3);
+  ctx.lineTo(width - width * w_2, height - height * h_2);
+  ctx.lineTo(width - width * w_1, height * h_1 + offset_h);
+  ctx.lineTo(width - width * w_0, height * h_0 + offset_h);
+  ctx.lineTo(width, 0 + offset_h);
+
+  ctx.lineWidth = 1;
+  ctx.lineCap = "round";
+
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.fillStyle = "#949494";
+  ctx.strokeStyle = "#c77d7d";
+  ctx.lineWidth = 15;
+  ctx.arc(width, height, 6, 0, 2 * Math.PI);
+  ctx.stroke();
+  ctx.fill();
+  ctx.closePath();
+
+  ctx.restore();
+};
+
 const drawPointer = (
   ctx: CanvasRenderingContext2D,
   val: number,
@@ -74,13 +197,13 @@ const drawPointer = (
   //Calculate differences
   const dx = end_x - start_x;
   const dy = end_y - start_y;
-  console.log(dx, dy);
 
   //   ctx.beginPath();
 
   //   const max_rotation = 340;
   //   const rotation_align_adjustment = (360 - max_rotation) / 2;
 
+  // Many pointers
   //   for (let i = 0; i <= max_rotation; i++) {
   //     // Angle in degrees and radians
   //     const angle_degrees = i + rotation_align_adjustment;
@@ -100,8 +223,33 @@ const drawPointer = (
 
   //   ctx.stroke();
 
-  ctx.save();
-  ctx.beginPath();
+  // Old implementation (simple pointer)
+
+  // ctx.save();
+  // ctx.beginPath();
+
+  // const max_rotation = MAX_ROTATION;
+  // const rotation_align_adjustment = (360 - max_rotation) / 2;
+
+  // const val_in_percentage = val / val_max;
+  // const val_in_degrees = val_in_percentage * max_rotation;
+
+  // const angle_degrees = val_in_degrees + rotation_align_adjustment;
+  // console.log(angle_degrees);
+  // const angle_radians = (angle_degrees * Math.PI) / 180;
+
+  // // Apply rotation
+  // const new_dx = dx * Math.cos(angle_radians) - dy * Math.sin(angle_radians);
+  // const new_dy = dx * Math.sin(angle_radians) + dy * Math.cos(angle_radians);
+
+  // const new_end_x = start_x + new_dx;
+  // const new_end_y = start_y + new_dy;
+
+  // ctx.moveTo(start_x, start_y);
+  // ctx.lineTo(new_end_x, new_end_y);
+
+  // ctx.stroke();
+  // ctx.restore();
 
   const max_rotation = MAX_ROTATION;
   const rotation_align_adjustment = (360 - max_rotation) / 2;
@@ -110,81 +258,8 @@ const drawPointer = (
   const val_in_degrees = val_in_percentage * max_rotation;
 
   const angle_degrees = val_in_degrees + rotation_align_adjustment;
-  console.log(angle_degrees);
-  const angle_radians = (angle_degrees * Math.PI) / 180;
 
-  // Apply rotation
-  const new_dx = dx * Math.cos(angle_radians) - dy * Math.sin(angle_radians);
-  const new_dy = dx * Math.sin(angle_radians) + dy * Math.cos(angle_radians);
-
-  const new_end_x = start_x + new_dx;
-  const new_end_y = start_y + new_dy;
-
-  ctx.moveTo(start_x, start_y);
-  ctx.lineTo(new_end_x, new_end_y);
-
-  ctx.stroke();
-  ctx.restore();
-};
-
-const pointer = (ctx: CanvasRenderingContext2D, rotationDeg: number) => {
-  ctx.save();
-
-  ctx.fillStyle = "#ff0000";
-  ctx.strokeStyle = "#f57474";
-
-  const width = WIDTH / 2;
-  const height = HEIHGT / 2;
-
-  const w_0 = 0.08;
-  const w_1 = 0.01;
-  const w_2 = 0.018;
-  const w_3 = 0.08;
-
-  const h_0 = 0.18;
-  const h_1 = 0.15;
-  const h_2 = 0;
-  const h_3 = 0.13;
-
-  const offset_h = height * 0.2;
-  
-  const path = new Path2D();
-  path.moveTo(width, 0 + offset_h);
-
-  path.lineTo(width + width * w_0, height * h_0 + offset_h);
-  path.lineTo(width + width * w_1, height * h_1 + offset_h);
-  path.lineTo(width + width * w_2, height - height * h_2);
-  path.lineTo(width + width * w_3, height + height * h_3);
-
-  path.lineTo(width - width * w_3, height + height * h_3);
-  path.lineTo(width - width * w_2, height - height * h_2);
-  path.lineTo(width - width * w_1, height * h_1 + offset_h);
-  path.lineTo(width - width * w_0, height * h_0 + offset_h);
-  path.lineTo(width, 0 + offset_h);
-
-  path.moveTo(width, height);
-
-  ctx.save();
-
-  // ctx.fillStyle = "yellow";
-  var rotation_center_point = { x: width, y: height};
-
-  ctx.translate(rotation_center_point.x, rotation_center_point.y);
-  
-
-
-  const angle_degrees = 45;
-  const angle_radians = (angle_degrees * Math.PI) / 180;
-
-  ctx.rotate(angle_radians);
-
-  ctx.translate(-rotation_center_point.x, -rotation_center_point.y)
-
-  ctx.stroke(path);
-  ctx.fill(path);
-
-
-  ctx.restore();
+  drawFancyPointer(ctx, angle_degrees);
 };
 
 const draw = (ctx: CanvasRenderingContext2D) => {
@@ -201,16 +276,9 @@ const draw = (ctx: CanvasRenderingContext2D) => {
 
   ctx.restore();
 
-  pointer(ctx, 90);
+  drawPointer(ctx, 50, 0, 100);
 
-  ctx.beginPath();
-  ctx.arc(WIDTH / 2, HEIHGT / 2, 2, 0, 2 * Math.PI);
-  ctx.closePath();
-  ctx.fill();
-
-  // drawPointer(ctx, 50, 0, 100);
-
-  // drawScaleLabels(ctx, 0, 100);
+  drawScaleLabels(ctx, 0, 100);
 
   //   for (let i = 0; i <= 200; i++) {
   //     drawPointer(ctx, i, 0, 200);
