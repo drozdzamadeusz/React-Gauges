@@ -1,0 +1,153 @@
+class Vector2 {
+  x: number;
+  y: number;
+
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
+  set(x: number, y: number): void {
+    this.x = x;
+    this.y = y;
+  }
+
+  magSq(): number {
+    return this.x * this.x + this.y * this.y;
+  }
+
+  mag(): number {
+    return Math.sqrt(this.magSq());
+  }
+
+  add(x: number | Vector2, y?: number): Vector2 {
+    if (x instanceof Vector2) {
+      this.x += x.x;
+      this.y += x.y;
+    } else if (typeof x === 'number' && typeof y === 'number') {
+      this.x += x;
+      this.y += y;
+    }
+    return this;
+  }
+
+  sub(x: number | Vector2, y?: number): Vector2 {
+    if (x instanceof Vector2) {
+      this.x -= x.x;
+      this.y -= x.y;
+    } else if (typeof x === 'number' && typeof y === 'number') {
+      this.x -= x;
+      this.y -= y;
+    }
+    return this;
+  }
+
+  div(n: number): Vector2 {
+    this.x /= n;
+    this.y /= n;
+    return this;
+  }
+
+  mult(n: number): Vector2 {
+    this.x *= n;
+    this.y *= n;
+    return this;
+  }
+
+  normalize(): Vector2 {
+    return this.div(this.mag());
+  }
+
+  setMag(n: number): Vector2 {
+    return this.normalize().mult(n);
+  }
+
+  dot(x: number | Vector2, y?: number): number {
+    if (x instanceof Vector2) {
+      return this.x * x.x + this.y * x.y;
+    }
+    return this.x * (x as number) + this.y * (y ?? 0);
+  }
+
+  dist(v: Vector2): number {
+    const d = v.copy().sub(this);
+    return d.mag();
+  }
+
+  limit(l: number): Vector2 {
+    const mSq = this.magSq();
+    if (mSq > l * l) {
+      this.div(Math.sqrt(mSq)).mult(l);
+    }
+    return this;
+  }
+
+  headingRads(): number {
+    return Math.atan2(this.y, this.x);
+  }
+
+  headingDegs(): number {
+    return (this.headingRads() * 180.0) / Math.PI;
+  }
+
+  rotateRads(a: number): Vector2 {
+    const newHead = this.headingRads() + a;
+    const mag = this.mag();
+    this.x = Math.cos(newHead) * mag;
+    this.y = Math.sin(newHead) * mag;
+    return this;
+  }
+
+  rotateDegs(a: number): Vector2 {
+    const r = (a * Math.PI) / 180.0;
+    return this.rotateRads(r);
+  }
+
+  angleBetweenRads(x: number | Vector2, y?: number): number {
+    let v1 = this.copy();
+    let v2: Vector2;
+
+    if (x instanceof Vector2) {
+      v2 = x.copy();
+    } else {
+      v2 = new Vector2(x as number, y ?? 0);
+    }
+    const angle = Math.acos(v1.dot(v2) / (v1.mag() * v2.mag()));
+    return angle;
+  }
+
+  angleBetweenDegs(x: number | Vector2, y?: number): number {
+    const r = this.angleBetweenRads(x, y);
+    return (r * 180) / Math.PI;
+  }
+
+  lerp(x: number | Vector2, y: number, amt: number): Vector2 {
+    if (x instanceof Vector2) {
+      return this.lerp(x.x, x.y, y);
+    }
+    if (amt > 1.0) {
+      amt = 1.0;
+    }
+    this.x += (x - this.x) * amt;
+    this.y += (y - this.y) * amt;
+    return this;
+  }
+
+  equals(x: number | Vector2, y?: number): boolean {
+    let a: number, b: number;
+    if (x instanceof Vector2) {
+      a = x.x;
+      b = x.y;
+    } else {
+      a = x as number;
+      b = y ?? 0;
+    }
+    return this.x === a && this.y === b;
+  }
+
+  copy(): Vector2 {
+    return new Vector2(this.x, this.y);
+  }
+}
+
+export default Vector2;
