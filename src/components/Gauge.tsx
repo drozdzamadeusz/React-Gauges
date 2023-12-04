@@ -189,10 +189,9 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   const roration_degrees = base_rataion + rotation_deg;
 
   rotateObject(ctx, new Vector2(width, height), roration_degrees);
-
-  ctx.fillStyle = "#900a29";
-  ctx.strokeStyle = "#a59999";
-  ctx.lineWidth = width * 0.03;
+  ctx.fillStyle = "#a60a2e";
+  ctx.strokeStyle = "#afa5a5";
+  ctx.lineWidth = width * 0.024;
   ctx.lineCap = "round";
 
   ctx.beginPath();
