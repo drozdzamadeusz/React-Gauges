@@ -20,7 +20,7 @@ const findFontSize = () => {
   } else if (HEIHGT <= 1000) {
     fontSize = 55;
   } else {
-    fontSize = 70;
+    fontSize = 60;
   }
   return fontSize;
 };
@@ -305,7 +305,7 @@ const draw = (ctx: CanvasRenderingContext2D) => {
 
   const min_val = 0;
   const max_val = 100;
-  const value = 45;
+  const value = 33;
 
   drawBackground(ctx);
 
