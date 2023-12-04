@@ -81,15 +81,15 @@ const drawScaleLabels = (
 
     const label_val = Math.round(percentage * (val_max - val_min) + val_min);
 
-    const lett_rotated = placeObjectOnCicle(center, lett_pos, rotation);
+    const lett_on_circle_pos = placeObjectOnCicle(center, lett_pos, rotation);
 
     ctx.save();
 
-    rotateObject(ctx, lett_rotated, rotation + 180);
+    rotateObject(ctx, lett_on_circle_pos, rotation + 180);
 
-    ctx.beginPath();
-    ctx.fillText(String(label_val), lett_rotated.x, lett_rotated.y);
-    ctx.closePath();
+    // ctx.beginPath();
+    ctx.fillText(String(label_val), lett_on_circle_pos.x, lett_on_circle_pos.y);
+    // ctx.closePath();
 
     ctx.restore();
   }
@@ -100,7 +100,7 @@ const drawBackground = (ctx: CanvasRenderingContext2D) => {
   const point = new Vector2(0, center.y);
 
   ctx.strokeStyle = "#22082e";
-  ctx.beginPath();
+  // ctx.beginPath();
 
   ctx.lineWidth = 1;
 
@@ -114,7 +114,7 @@ const drawBackground = (ctx: CanvasRenderingContext2D) => {
     ctx.lineTo(point_rotated.x, point_rotated.y);
   }
 
-  ctx.closePath();
+  // ctx.closePath();
   ctx.stroke();
 };
 
@@ -145,24 +145,24 @@ const drawTicks = (
     const percentage = i / num_ticks;
     const rotation = percentage * MAX_ROTATION + ROTARTION_ADJUSTMENT;
 
-    const p1_rotated = placeObjectOnCicle(center, p1, rotation);
-    const p2_rotated = placeObjectOnCicle(center, p2, rotation);
+    const p1_on_circle = placeObjectOnCicle(center, p1, rotation);
+    const p2_on_circle = placeObjectOnCicle(center, p2, rotation);
 
-    ctx.fillStyle = "#a328d9";
+    // ctx.fillStyle = "#a328d9";
     ctx.strokeStyle = "#a328d9";
 
-    ctx.beginPath();
-    // ctx.arc(p1_rotated.x, p1_rotated.y, center.x * 0.005, 0, 2 * Math.PI);
-    ctx.arc(p2_rotated.x, p2_rotated.y, center.x * 0.005, 0, 2 * Math.PI);
-    ctx.closePath();
-    ctx.fill();
+    // ctx.beginPath();
+    // ctx.arc(p1_on_circle.x, p1_on_circle.y, center.x * 0.005, 0, 2 * Math.PI);
+    // ctx.arc(p2_on_circle.x, p2_on_circle.y, center.x * 0.005, 0, 2 * Math.PI);
+    // ctx.closePath();
+    // ctx.fill();
 
-    // ctx.lineCap = "round";
+    ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.moveTo(p1_rotated.x, p1_rotated.y);
-    ctx.lineTo(p2_rotated.x, p2_rotated.y);
+    ctx.moveTo(p1_on_circle.x, p1_on_circle.y);
+    ctx.lineTo(p2_on_circle.x, p2_on_circle.y);
     ctx.stroke();
-    ctx.closePath();
+    // ctx.closePath();
   }
 };
 
@@ -186,9 +186,9 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
 
   const base_rataion = 180;
 
-  const roration_degrees = base_rataion + rotation_deg;
+  const rotation_degrees = base_rataion + rotation_deg;
 
-  rotateObject(ctx, new Vector2(width, height), roration_degrees);
+  rotateObject(ctx, new Vector2(width, height), rotation_degrees);
   ctx.fillStyle = "#a60a2e";
   ctx.strokeStyle = "#afa5a5";
   ctx.lineWidth = width * 0.024;
@@ -264,7 +264,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   ctx.fill();
 
   ctx.beginPath();
-  ctx.fillStyle = "#726d6d";
+  ctx.fillStyle = "#c2c2c2";
   ctx.arc(width, height, width * 0.04, 0, 2 * Math.PI);
   ctx.stroke();
   ctx.fill();
@@ -279,7 +279,7 @@ const calculatePointerRotation = (
   val_max: number
 ) => {
   const max_rotation = MAX_ROTATION;
-  const rotation_align_adjustment = (360 - max_rotation) / 2;
+  const rotation_align_adjustment = ROTARTION_ADJUSTMENT;
 
   const val_in_ranges = Math.min(Math.max(val, val_min), val_max);
   const in_percentage = (val_in_ranges - val_min) / (val_max - val_min);
@@ -292,34 +292,27 @@ const draw = (ctx: CanvasRenderingContext2D) => {
   ctx.font = FONT;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+
+  ctx.fillStyle = "#181818";
+  ctx.arc(WIDTH / 2, HEIHGT / 2, WIDTH / 2, 0, 2 * Math.PI);
+  ctx.fill()
+
   ctx.fillStyle = "#ffffff";
   ctx.strokeStyle = "#a328d9";
 
   ctx.save();
 
-  ctx.fillStyle = "red";
-  ctx.strokeStyle = "red";
-
-  ctx.restore();
 
   const min_val = 0;
   const max_val = 100;
-  const value = 33;
+  const value = 88;
 
   drawBackground(ctx);
-
   drawTicks(ctx, min_val, max_val);
-
-  // ctx.beginPath();
-
-  // ctx.arc(WIDTH / 2, HEIHGT / 2, 6, 0, 2 * Math.PI);
-  // ctx.stroke();
-  // ctx.closePath();
+  drawScaleLabels(ctx, min_val, max_val);
 
   const pointer_rotation = calculatePointerRotation(value, min_val, max_val);
   drawPointer(ctx, pointer_rotation);
-
-  drawScaleLabels(ctx, min_val, max_val);
 };
 
 const Gauge = () => {
