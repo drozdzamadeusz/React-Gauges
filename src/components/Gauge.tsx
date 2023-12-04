@@ -14,7 +14,7 @@ const findFontSize = () => {
   } else if (HEIHGT <= 400) {
     fontSize = 30;
   } else if (HEIHGT <= 600) {
-    fontSize = 40;
+    fontSize = 35;
   } else if (HEIHGT <= 800) {
     fontSize = 50;
   } else if (HEIHGT <= 1000) {
@@ -69,7 +69,7 @@ const drawScaleLabels = (
   val_min: number,
   val_max: number
 ) => {
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#d2d2d2";
 
   const center = new Vector2(WIDTH / 2, HEIHGT / 2);
   const lett_pos = new Vector2(0, center.y - center.y * 0.11);
@@ -293,7 +293,7 @@ const draw = (ctx: CanvasRenderingContext2D) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  ctx.fillStyle = "#181818";
+  ctx.fillStyle = "#090909";
   ctx.arc(WIDTH / 2, HEIHGT / 2, WIDTH / 2, 0, 2 * Math.PI);
   ctx.fill()
 
