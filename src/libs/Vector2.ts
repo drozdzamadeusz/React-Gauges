@@ -1,4 +1,4 @@
-class Vector2 {
+class Vec2 {
   x: number;
   y: number;
 
@@ -20,61 +20,69 @@ class Vector2 {
     return Math.sqrt(this.magSq());
   }
 
-  add(x: number | Vector2, y?: number): Vector2 {
-    if (x instanceof Vector2) {
+  add(x: number | Vec2, y?: number): Vec2 {
+    if (x instanceof Vec2) {
       this.x += x.x;
       this.y += x.y;
-    } else if (typeof x === 'number' && typeof y === 'number') {
+    } else if (typeof x === "number" && typeof y === "number") {
       this.x += x;
       this.y += y;
     }
     return this;
   }
 
-  sub(x: number | Vector2, y?: number): Vector2 {
-    if (x instanceof Vector2) {
+  sub(x: number | Vec2, y?: number): Vec2 {
+    if (x instanceof Vec2) {
       this.x -= x.x;
       this.y -= x.y;
-    } else if (typeof x === 'number' && typeof y === 'number') {
+    } else if (typeof x === "number" && typeof y === "number") {
       this.x -= x;
       this.y -= y;
     }
     return this;
   }
 
-  div(n: number): Vector2 {
+  div(n: number): Vec2 {
     this.x /= n;
     this.y /= n;
     return this;
   }
 
-  mult(n: number): Vector2 {
-    this.x *= n;
-    this.y *= n;
+  mult(x: number | Vec2, y?: number): Vec2 {
+    if (x instanceof Vec2) {
+      this.x *= x.x;
+      this.y *= x.y;
+    } else if (typeof x === "number" && typeof y === "number") {
+      this.x *= x;
+      this.y *= y;
+    } else if (typeof x === "number") {
+      this.x *= x;
+      this.y *= x;
+    }
     return this;
   }
 
-  normalize(): Vector2 {
+  normalize(): Vec2 {
     return this.div(this.mag());
   }
 
-  setMag(n: number): Vector2 {
+  setMag(n: number): Vec2 {
     return this.normalize().mult(n);
   }
 
-  dot(x: number | Vector2, y?: number): number {
-    if (x instanceof Vector2) {
+  dot(x: number | Vec2, y?: number): number {
+    if (x instanceof Vec2) {
       return this.x * x.x + this.y * x.y;
     }
     return this.x * (x as number) + this.y * (y ?? 0);
   }
 
-  dist(v: Vector2): number {
+  dist(v: Vec2): number {
     const d = v.copy().sub(this);
     return d.mag();
   }
 
-  limit(l: number): Vector2 {
+  limit(l: number): Vec2 {
     const mSq = this.magSq();
     if (mSq > l * l) {
       this.div(Math.sqrt(mSq)).mult(l);
@@ -90,7 +98,7 @@ class Vector2 {
     return (this.headingRads() * 180.0) / Math.PI;
   }
 
-  rotateRads(a: number): Vector2 {
+  rotateRads(a: number): Vec2 {
     const newHead = this.headingRads() + a;
     const mag = this.mag();
     this.x = Math.cos(newHead) * mag;
@@ -98,31 +106,31 @@ class Vector2 {
     return this;
   }
 
-  rotateDegs(a: number): Vector2 {
+  rotateDegs(a: number): Vec2 {
     const r = (a * Math.PI) / 180.0;
     return this.rotateRads(r);
   }
 
-  angleBetweenRads(x: number | Vector2, y?: number): number {
+  angleBetweenRads(x: number | Vec2, y?: number): number {
     let v1 = this.copy();
-    let v2: Vector2;
+    let v2: Vec2;
 
-    if (x instanceof Vector2) {
+    if (x instanceof Vec2) {
       v2 = x.copy();
     } else {
-      v2 = new Vector2(x as number, y ?? 0);
+      v2 = new Vec2(x as number, y ?? 0);
     }
     const angle = Math.acos(v1.dot(v2) / (v1.mag() * v2.mag()));
     return angle;
   }
 
-  angleBetweenDegs(x: number | Vector2, y?: number): number {
+  angleBetweenDegs(x: number | Vec2, y?: number): number {
     const r = this.angleBetweenRads(x, y);
     return (r * 180) / Math.PI;
   }
 
-  lerp(x: number | Vector2, y: number, amt: number): Vector2 {
-    if (x instanceof Vector2) {
+  lerp(x: number | Vec2, y: number, amt: number): Vec2 {
+    if (x instanceof Vec2) {
       return this.lerp(x.x, x.y, y);
     }
     if (amt > 1.0) {
@@ -133,9 +141,9 @@ class Vector2 {
     return this;
   }
 
-  equals(x: number | Vector2, y?: number): boolean {
+  equals(x: number | Vec2, y?: number): boolean {
     let a: number, b: number;
-    if (x instanceof Vector2) {
+    if (x instanceof Vec2) {
       a = x.x;
       b = x.y;
     } else {
@@ -145,9 +153,9 @@ class Vector2 {
     return this.x === a && this.y === b;
   }
 
-  copy(): Vector2 {
-    return new Vector2(this.x, this.y);
+  copy(): Vec2 {
+    return new Vec2(this.x, this.y);
   }
 }
 
-export default Vector2;
+export default Vec2;
