@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import "./Gauge.css";
 import Vector2 from "./../libs/Vector2";
 
-const HEIHGT = 1000;
+const HEIHGT = 800;
 const WIDTH = HEIHGT;
 
 const findFontSize = () => {
@@ -25,7 +25,7 @@ const findFontSize = () => {
   return fontSize;
 };
 
-const FONT = `bold ${findFontSize()}px 'Georgia'`;
+const FONT = `${findFontSize()}px 'Georgia'`;
 
 const MAX_ROTATION = 300;
 const ROTARTION_ADJUSTMENT = (360 - MAX_ROTATION) / 2;
@@ -72,7 +72,7 @@ const drawScaleLabels = (
   ctx.fillStyle = "#ffffff";
 
   const center = new Vector2(WIDTH / 2, HEIHGT / 2);
-  const lett_pos = new Vector2(0, center.y - center.y * 0.1);
+  const lett_pos = new Vector2(0, center.y - center.y * 0.11);
   const num_labels = Math.min(MAX_NUM_LABELS, val_max - val_min);
 
   for (let i = 0; i <= num_labels; i++) {
