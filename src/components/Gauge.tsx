@@ -2,20 +2,37 @@ import React, { useEffect, useRef } from "react";
 import "./Gauge.css";
 import Vector2 from "./../libs/Vector2";
 
-const HEIHGT = 800;
+const HEIHGT = 1000;
 const WIDTH = HEIHGT;
-const LETTER_HEIGHT = 50;
 
+const findFontSize = () => {
+  let fontSize;
+  if (HEIHGT <= 300) {
+    fontSize = 20;
+  } else if (HEIHGT <= 400) {
+    fontSize = 30;
+  } else if (HEIHGT <= 600) {
+    fontSize = 40;
+  } else if (HEIHGT <= 800) {
+    fontSize = 50;
+  } else if (HEIHGT <= 1000) {
+    fontSize = 60;
+  } else {
+    fontSize = 70;
+  }
+  return fontSize;
+};
+
+const FONT = `bold ${findFontSize()}px 'Georgia'`;
 
 const MAX_ROTATION = 300;
 const ROTARTION_ADJUSTMENT = (360 - MAX_ROTATION) / 2;
 
 const MAX_NUM_LABELS = 10;
-const TICKS_LABELS_MULT = 3;
+const TICKS_LABELS_MULT = 4;
 const MAX_NUM_TICKS = TICKS_LABELS_MULT * MAX_NUM_LABELS;
 
-
-const rotateObjectOnCicle = (
+const placeObjectOnCicle = (
   rotation_center_pos: Vector2,
   object_pos: Vector2,
   rotatnion_deg: number
@@ -34,78 +51,69 @@ const rotateObjectOnCicle = (
   return rotation_matrix.add(rotation_center_pos);
 };
 
+const rotateObject = (
+  ctx: CanvasRenderingContext2D,
+  rotation_center_pos: Vector2,
+  rotatnion_deg: number
+) => {
+  const angle_radians = (rotatnion_deg * Math.PI) / 180;
+  ctx.translate(rotation_center_pos.x, rotation_center_pos.y);
+  ctx.rotate(angle_radians);
+  ctx.translate(-rotation_center_pos.x, -rotation_center_pos.y);
+};
+
 const drawScaleLabels = (
   ctx: CanvasRenderingContext2D,
   val_min: number,
   val_max: number
 ) => {
+  ctx.fillStyle = "#ffffff";
+
   const center = new Vector2(WIDTH / 2, HEIHGT / 2);
-  const lett_pos = new Vector2(0, center.y - center.y * 0.07);
-
+  const lett_pos = new Vector2(0, center.y - center.y * 0.1);
   const num_labels = Math.min(MAX_NUM_LABELS, val_max - val_min);
-
-  const lett_height = LETTER_HEIGHT;
-
-  ctx.beginPath();
 
   for (let i = 0; i <= num_labels; i++) {
     const percentage = i / num_labels;
     const rotation = percentage * MAX_ROTATION + ROTARTION_ADJUSTMENT;
-    const angle_radians = (rotation * Math.PI) / 180;
 
-    const lett_rotated = rotateObjectOnCicle(center, lett_pos, rotation);
+    const label_val = Math.round(percentage * (val_max - val_min) + val_min);
+
+    const lett_rotated = placeObjectOnCicle(center, lett_pos, rotation);
 
     ctx.save();
 
-    ctx.translate(lett_rotated.x, lett_rotated.y);
-    ctx.rotate(angle_radians - Math.PI);
+    rotateObject(ctx, lett_rotated, rotation + 180);
 
-    ctx.textAlign = "center";
-
-    const label = Math.round(percentage * (val_max - val_min) + val_min);
-    ctx.fillText(String(label), 0, lett_height /2);
+    ctx.beginPath();
+    ctx.fillText(String(label_val), lett_rotated.x, lett_rotated.y);
+    ctx.closePath();
 
     ctx.restore();
   }
-
-  ctx.closePath();
 };
 
 const drawBackground = (ctx: CanvasRenderingContext2D) => {
-  ctx.save();
+  const center = new Vector2(WIDTH / 2, HEIHGT / 2);
+  const point = new Vector2(0, center.y);
 
-  const start_x = WIDTH / 2;
-  const start_y = HEIHGT / 2;
-  const end_x = WIDTH / 2;
-  const end_y = HEIHGT;
-
-  //Calculate differences
-  const dx = end_x - start_x;
-  const dy = end_y - start_y;
-
-  ctx.strokeStyle = "#2e0808";
+  ctx.strokeStyle = "#22082e";
   ctx.beginPath();
 
   ctx.lineWidth = 1;
 
-  for (let j = 0; j <= 318; j++) {
-    // Angle in degrees and radians
-    const angle_degrees = j + ROTARTION_ADJUSTMENT - 9;
-    const angle_radians = (angle_degrees * Math.PI) / 180;
+  // for (let j = 0; j <= 318; j++) {
+  //   const angle_degrees = j + ROTARTION_ADJUSTMENT - 9;
 
-    // Apply rotation
-    const new_dx = dx * Math.cos(angle_radians) - dy * Math.sin(angle_radians);
-    const new_dy = dx * Math.sin(angle_radians) + dy * Math.cos(angle_radians);
-
-    const new_end_x = start_x + new_dx;
-    const new_end_y = start_y + new_dy;
-
-    ctx.moveTo(start_x, start_y);
-    ctx.lineTo(new_end_x, new_end_y);
+  for (let j = 0; j <= 360; j++) {
+    const angle_degrees = j;
+    const point_rotated = placeObjectOnCicle(center, point, angle_degrees);
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(point_rotated.x, point_rotated.y);
   }
-  ctx.stroke();
 
-  ctx.restore();
+  ctx.closePath();
+  ctx.stroke();
 };
 
 const drawTicks = (
@@ -115,8 +123,8 @@ const drawTicks = (
 ) => {
   const center = new Vector2(WIDTH / 2, HEIHGT / 2);
 
-  const p1 = new Vector2(0, center.y - center.y * 0.31);
-  const p2 = new Vector2(0, center.y - center.y * 0.21);
+  const p1 = new Vector2(0, center.y - center.y * 0.3);
+  const p2 = new Vector2(0, 0);
 
   const num_ticks = Math.min(
     MAX_NUM_TICKS,
@@ -125,36 +133,35 @@ const drawTicks = (
 
   for (let i = 0; i <= num_ticks; i++) {
     if (i == 0 || i % TICKS_LABELS_MULT == 0) {
-      p2.y = center.y - center.y * 0.2;
+      p2.y = center.y - center.y * 0.21;
+      ctx.lineWidth = center.x * 0.014;
     } else {
       p2.y = center.y - center.y * 0.26;
+      ctx.lineWidth = center.x * 0.01;
     }
 
     const percentage = i / num_ticks;
     const rotation = percentage * MAX_ROTATION + ROTARTION_ADJUSTMENT;
 
-    const p1_rotated = rotateObjectOnCicle(center, p1, rotation);
-    const p2_rotated = rotateObjectOnCicle(center, p2, rotation);
+    const p1_rotated = placeObjectOnCicle(center, p1, rotation);
+    const p2_rotated = placeObjectOnCicle(center, p2, rotation);
 
     ctx.fillStyle = "#a328d9";
     ctx.strokeStyle = "#a328d9";
 
     ctx.beginPath();
-    ctx.arc(p1_rotated.x, p1_rotated.y, 2, 0, 2 * Math.PI);
-    ctx.arc(p2_rotated.x, p2_rotated.y, 2, 0, 2 * Math.PI);
+    // ctx.arc(p1_rotated.x, p1_rotated.y, center.x * 0.005, 0, 2 * Math.PI);
+    ctx.arc(p2_rotated.x, p2_rotated.y, center.x * 0.005, 0, 2 * Math.PI);
     ctx.closePath();
     ctx.fill();
 
-    ctx.lineWidth = 2;
+    // ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(p1_rotated.x, p1_rotated.y);
     ctx.lineTo(p2_rotated.x, p2_rotated.y);
     ctx.stroke();
     ctx.closePath();
-    ctx.fill();
   }
-
-  ctx.stroke();
 };
 
 const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
@@ -164,33 +171,26 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
 
   //Offsets
   const w_0 = 0.08;
-  const w_1 = 0.004;
+  const w_1 = 0.005;
   const w_2 = 0.018;
-  const w_3 = 0.09;
+  const w_3 = 0.1;
 
   const h_0 = 0.18;
-  const h_1 = 0.15;
-  const h_2 = 0;
-  const h_3 = 0.24;
+  const h_1 = 0.14;
+  const h_2 = -0.055;
+  const h_3 = 0.21;
 
-  const pointer_height_offset = height * 0.15;
-
-  var rotation_center_point = { x: width, y: height };
-
-  ctx.translate(rotation_center_point.x, rotation_center_point.y);
+  const pointer_height_offset = height * 0.292;
 
   const base_rataion = 180;
 
   const roration_degrees = base_rataion + rotation_deg;
-  const rotatnio_radians = (roration_degrees * Math.PI) / 180;
 
-  ctx.rotate(rotatnio_radians);
+  rotateObject(ctx, new Vector2(width, height), roration_degrees);
 
-  ctx.translate(-rotation_center_point.x, -rotation_center_point.y);
-
-  ctx.fillStyle = "#ff0000";
-  ctx.strokeStyle = "#cb7272";
-  ctx.lineWidth = 5;
+  ctx.fillStyle = "#900a29";
+  ctx.strokeStyle = "#a59999";
+  ctx.lineWidth = width * 0.03;
   ctx.lineCap = "round";
 
   ctx.beginPath();
@@ -260,17 +260,11 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   ctx.lineTo(width - width * w_1, height * h_1 + pointer_height_offset);
   ctx.lineTo(width - width * w_0, height * h_0 + pointer_height_offset);
   ctx.lineTo(width, 0 + pointer_height_offset);
-
-  ctx.lineWidth = 1;
-  ctx.lineCap = "round";
-
   ctx.fill();
 
   ctx.beginPath();
-  ctx.fillStyle = "#949494";
-  ctx.strokeStyle = "#c77d7d";
-  ctx.lineWidth = 15;
-  ctx.arc(width, height, 6, 0, 2 * Math.PI);
+  ctx.fillStyle = "#726d6d";
+  ctx.arc(width, height, width * 0.04, 0, 2 * Math.PI);
   ctx.stroke();
   ctx.fill();
   ctx.closePath();
@@ -286,15 +280,15 @@ const calculatePointerRotation = (
   const max_rotation = MAX_ROTATION;
   const rotation_align_adjustment = (360 - max_rotation) / 2;
 
-  const val_no_less_than_min = Math.max(val, val_min);
-  const in_percentage = (val_no_less_than_min - val_min) / (val_max - val_min);
+  const val_in_ranges = Math.min(Math.max(val, val_min), val_max);
+  const in_percentage = (val_in_ranges - val_min) / (val_max - val_min);
   const in_degrees = in_percentage * max_rotation + rotation_align_adjustment;
 
   return in_degrees;
 };
 
 const draw = (ctx: CanvasRenderingContext2D) => {
-  ctx.font = `bold ${LETTER_HEIGHT}px 'Courier New'`;
+  ctx.font = FONT;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#ffffff";
@@ -307,8 +301,9 @@ const draw = (ctx: CanvasRenderingContext2D) => {
 
   ctx.restore();
 
-  const min_val = 10;
+  const min_val = 0;
   const max_val = 100;
+  const value = 45;
 
   drawBackground(ctx);
 
@@ -320,7 +315,7 @@ const draw = (ctx: CanvasRenderingContext2D) => {
   ctx.stroke();
   ctx.closePath();
 
-  const pointer_rotation = calculatePointerRotation(64, min_val, max_val);
+  const pointer_rotation = calculatePointerRotation(value, min_val, max_val);
   drawPointer(ctx, pointer_rotation);
 
   drawScaleLabels(ctx, min_val, max_val);
