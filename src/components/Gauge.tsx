@@ -7,7 +7,9 @@ const WIDTH = HEIHGT;
 
 const findFontSize = () => {
   let fontSize;
-  if (HEIHGT <= 300) {
+  if (HEIHGT <= 250) {
+    fontSize = 16;
+  } else if (HEIHGT <= 300) {
     fontSize = 20;
   } else if (HEIHGT <= 400) {
     fontSize = 30;
@@ -16,7 +18,7 @@ const findFontSize = () => {
   } else if (HEIHGT <= 800) {
     fontSize = 50;
   } else if (HEIHGT <= 1000) {
-    fontSize = 60;
+    fontSize = 55;
   } else {
     fontSize = 70;
   }
@@ -28,8 +30,8 @@ const FONT = `bold ${findFontSize()}px 'Georgia'`;
 const MAX_ROTATION = 300;
 const ROTARTION_ADJUSTMENT = (360 - MAX_ROTATION) / 2;
 
-const MAX_NUM_LABELS = 10;
-const TICKS_LABELS_MULT = 4;
+const MAX_NUM_LABELS = 20;
+const TICKS_LABELS_MULT = 5;
 const MAX_NUM_TICKS = TICKS_LABELS_MULT * MAX_NUM_LABELS;
 
 const placeObjectOnCicle = (
@@ -309,11 +311,11 @@ const draw = (ctx: CanvasRenderingContext2D) => {
 
   drawTicks(ctx, min_val, max_val);
 
-  ctx.beginPath();
+  // ctx.beginPath();
 
-  ctx.arc(WIDTH / 2, HEIHGT / 2, 6, 0, 2 * Math.PI);
-  ctx.stroke();
-  ctx.closePath();
+  // ctx.arc(WIDTH / 2, HEIHGT / 2, 6, 0, 2 * Math.PI);
+  // ctx.stroke();
+  // ctx.closePath();
 
   const pointer_rotation = calculatePointerRotation(value, min_val, max_val);
   drawPointer(ctx, pointer_rotation);
