@@ -202,8 +202,8 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   // Store current context before rotation
   ctx.save();
 
-  ctx.fillStyle = "#a60a2e";
-  ctx.strokeStyle = "#633131";
+  ctx.fillStyle = "#af0c32";
+  ctx.strokeStyle = "#852d2d";
   ctx.lineWidth = c_x * 0.024;
   ctx.lineCap = "round";
 
