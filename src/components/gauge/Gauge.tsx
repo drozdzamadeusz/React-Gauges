@@ -34,21 +34,15 @@ const MAX_NUM_LABELS = 20;
 const TICKS_LABELS_MULT = 5;
 const MAX_NUM_TICKS = TICKS_LABELS_MULT * MAX_NUM_LABELS;
 
-const placeObjectOnCicle = (
-  rotation_center_pos: Vec2,
-  object_pos: Vec2,
-  rotatnion_deg: number
-) => {
+const placeObjectOnCicle = (center: Vec2, obj: Vec2, rotatnion_deg: number) => {
   const angle_radians = (rotatnion_deg * Math.PI) / 180;
 
   const rotation_matrix = new Vec2(
-    object_pos.x * Math.cos(angle_radians) -
-      object_pos.y * Math.sin(angle_radians),
-    object_pos.x * Math.sin(angle_radians) +
-      object_pos.y * Math.cos(angle_radians)
+    obj.x * Math.cos(angle_radians) - obj.y * Math.sin(angle_radians),
+    obj.x * Math.sin(angle_radians) + obj.y * Math.cos(angle_radians)
   );
 
-  return rotation_matrix.add(rotation_center_pos);
+  return rotation_matrix.add(center);
 };
 
 const rotateObject = (
@@ -157,7 +151,6 @@ const drawTicks = (
     ctx.moveTo(p1_on_circle.x, p1_on_circle.y);
     ctx.lineTo(p2_on_circle.x, p2_on_circle.y);
     ctx.stroke();
-    // ctx.closePath();
   }
 };
 
@@ -230,7 +223,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   ctx.stroke();
   ctx.closePath();
 
-  // // Draw arrow's even sharper end  
+  // // Draw arrow's even sharper end
   // ctx.beginPath();
   // ctx.moveTo(p_1.x, p_1.y);
   // ctx.lineTo(p_0.x, p_0.y);
@@ -241,10 +234,8 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   // ctx.fill();
   // ctx.stroke();
 
-
   // Draw arrow background
   ctx.beginPath();
-  
 
   for (let i = 1; i < points.length; i++) {
     const p = points[i];
