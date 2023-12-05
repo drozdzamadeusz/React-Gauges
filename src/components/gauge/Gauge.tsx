@@ -103,13 +103,13 @@ const drawBackground = (ctx: CanvasRenderingContext2D) => {
 
   ctx.beginPath();
   for (let j = 0; j < 720; j++) {
-    const angle_degrees = j /2;
+    const angle_degrees = j / 2;
     const point_rotated = placeObjectOnCicle(center, point, angle_degrees);
     ctx.moveTo(center.x, center.y);
     ctx.lineTo(point_rotated.x, point_rotated.y);
   }
   ctx.closePath();
-  
+
   ctx.stroke();
 };
 
@@ -199,7 +199,8 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
 
   const points = [p_0, p_1, p_2, p_3, p_4, p_m_4, p_m_3, p_m_2, p_m_1, p_m_0];
 
-  ctx.save(); // Store current context before rotation
+  // Store current context before rotation
+  ctx.save();
 
   ctx.fillStyle = "#a60a2e";
   ctx.strokeStyle = "#fe4c4c";
@@ -209,18 +210,19 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   // Rotate pointer
   rotateObject(ctx, new Vec2(c_x, c_y), rotation_deg);
 
-  // Draw outhline
+  // Draw awrrow outline
   ctx.beginPath();
+
   for (let i = 0; i < points.length - 1; i++) {
     const from = points[i];
     const to = points[i + 1];
     ctx.moveTo(from.x, from.y);
     ctx.lineTo(to.x, to.y);
   }
-  ctx.closePath();
+
   ctx.stroke();
 
-  // Draw sharp arrow
+  // Draw arrow's sharp end
   ctx.beginPath();
   ctx.moveTo(p_1.x, p_1.y);
   ctx.lineTo(p_0.x, p_0.y);
@@ -228,17 +230,16 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   ctx.stroke();
   ctx.closePath();
 
-  // Draw background
+  // Draw arrow background
   ctx.beginPath();
-  ctx.moveTo(p_0.x, p_0.y);
-  for (let i = 1; i < points.length - 1; i++) {
+  
+  for (let i = 1; i < points.length; i++) {
     const p = points[i];
     ctx.lineTo(p.x, p.y);
   }
-  ctx.closePath();
   ctx.fill();
 
-  // Draw center
+  // Draw the nail that rotates arrow
   ctx.beginPath();
   ctx.fillStyle = "#c2c2c2";
   ctx.arc(c_x, c_y, c_x * 0.04, 0, 2 * Math.PI);
@@ -246,6 +247,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   ctx.stroke();
   ctx.fill();
 
+  // Restoring context after rotation
   ctx.restore();
 };
 
