@@ -203,7 +203,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   ctx.save();
 
   ctx.fillStyle = "#a60a2e";
-  ctx.strokeStyle = "#fe4c4c";
+  ctx.strokeStyle = "#633131";
   ctx.lineWidth = c_x * 0.024;
   ctx.lineCap = "round";
 
@@ -230,9 +230,22 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   ctx.stroke();
   ctx.closePath();
 
+  // // Draw arrow's even sharper end  
+  // ctx.beginPath();
+  // ctx.moveTo(p_1.x, p_1.y);
+  // ctx.lineTo(p_0.x, p_0.y);
+  // ctx.lineTo(p_m_1.x, p_m_1.y);
+  // ctx.lineTo(p_m_2.x, p_m_2.y);
+  // ctx.lineTo(p_1.x, p_1.y);
+  // ctx.closePath();
+  // ctx.fill();
+  // ctx.stroke();
+
+
   // Draw arrow background
   ctx.beginPath();
   
+
   for (let i = 1; i < points.length; i++) {
     const p = points[i];
     ctx.lineTo(p.x, p.y);
@@ -241,7 +254,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
 
   // Draw the nail that rotates arrow
   ctx.beginPath();
-  ctx.fillStyle = "#c2c2c2";
+  ctx.fillStyle = "#767676";
   ctx.arc(c_x, c_y, c_x * 0.04, 0, 2 * Math.PI);
   ctx.closePath();
   ctx.stroke();
