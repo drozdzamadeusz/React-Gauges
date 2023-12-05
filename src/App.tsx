@@ -1,5 +1,5 @@
 import React from "react";
-import Gauge from "../src/components/Gauge";
+import Gauge from "./components/gauge/Gauge";
 
 const App = () => (
   <div className="container">

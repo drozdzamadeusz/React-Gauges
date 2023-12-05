@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import "./Gauge.css";
-import Vec2 from "../libs/vector2";
+import Vec2 from "../../libs/vector2";
 
 const HEIHGT = 800;
 const WIDTH = HEIHGT;
