@@ -1,22 +1,41 @@
 import React, { useEffect, useRef } from "react";
 import "./Gauge.css";
-import Vec2 from "../../libs/vector2";
+import { Vec2, Canvans2, Math2 } from "../../libs";
 
 const HEIHGT = 800;
 const WIDTH = HEIHGT;
 
-const findFontSize = () => {
+let MAX_ROTATION = 300;
+let ROTARTION_ADJUSTMENT = (360 - MAX_ROTATION) / 2;
+
+let MAX_NUM_LABELS = 20;
+let TICKS_LABELS_MULT = 3;
+let fontSize;
+
+const findVals = () => {
   let fontSize;
-  if (HEIHGT <= 250) {
+  if (HEIHGT <= 150) {
+    MAX_NUM_LABELS = 20 / 2
+    fontSize = 16;
+  }if (HEIHGT <= 250) {
+    MAX_NUM_LABELS = 20 / 2
     fontSize = 16;
   } else if (HEIHGT <= 300) {
+    MAX_NUM_LABELS = 20 / 2
     fontSize = 20;
   } else if (HEIHGT <= 400) {
+    MAX_NUM_LABELS = 20 / 2
+    fontSize = 30;
+  } else if (HEIHGT <= 600) {
     fontSize = 30;
   } else if (HEIHGT <= 600) {
     fontSize = 35;
+  } else if (HEIHGT <= 700) {
+    TICKS_LABELS_MULT = 2;
+    MAX_NUM_LABELS = 10
+    fontSize = 40;
   } else if (HEIHGT <= 800) {
-    fontSize = 50;
+    fontSize = 45;
   } else if (HEIHGT <= 1000) {
     fontSize = 55;
   } else {
@@ -25,36 +44,8 @@ const findFontSize = () => {
   return fontSize;
 };
 
-const FONT = `${findFontSize()}px 'Georgia'`;
-
-const MAX_ROTATION = 300;
-const ROTARTION_ADJUSTMENT = (360 - MAX_ROTATION) / 2;
-
-const MAX_NUM_LABELS = 20;
-const TICKS_LABELS_MULT = 5;
 const MAX_NUM_TICKS = TICKS_LABELS_MULT * MAX_NUM_LABELS;
-
-const placeObjectOnCicle = (center: Vec2, obj: Vec2, rotatnion_deg: number) => {
-  const angle_radians = (rotatnion_deg * Math.PI) / 180;
-
-  const rotation_matrix = new Vec2(
-    obj.x * Math.cos(angle_radians) - obj.y * Math.sin(angle_radians),
-    obj.x * Math.sin(angle_radians) + obj.y * Math.cos(angle_radians)
-  );
-
-  return rotation_matrix.add(center);
-};
-
-const rotateObject = (
-  ctx: CanvasRenderingContext2D,
-  rotation_center_pos: Vec2,
-  rotatnion_deg: number
-) => {
-  const angle_radians = (rotatnion_deg * Math.PI) / 180;
-  ctx.translate(rotation_center_pos.x, rotation_center_pos.y);
-  ctx.rotate(angle_radians);
-  ctx.translate(-rotation_center_pos.x, -rotation_center_pos.y);
-};
+const FONT = `${findVals()}px 'Georgia'`;
 
 const drawScaleLabels = (
   ctx: CanvasRenderingContext2D,
@@ -73,11 +64,15 @@ const drawScaleLabels = (
 
     const label_val = Math.round(percentage * (val_max - val_min) + val_min);
 
-    const lett_on_circle_pos = placeObjectOnCicle(center, lett_pos, rotation);
+    const lett_on_circle_pos = Math2.apply_rotation_matrix(
+      center,
+      lett_pos,
+      rotation
+    );
 
     ctx.save();
 
-    rotateObject(ctx, lett_on_circle_pos, rotation + 180);
+    Canvans2.rotateCanvans(ctx, lett_on_circle_pos, rotation + 180);
     ctx.fillText(String(label_val), lett_on_circle_pos.x, lett_on_circle_pos.y);
 
     ctx.restore();
@@ -92,13 +87,14 @@ const drawBackground = (ctx: CanvasRenderingContext2D) => {
 
   ctx.lineWidth = center.x * 0.003;
 
-  // for (let j = 0; j <= 318; j++) {
-  //   const angle_degrees = j + ROTARTION_ADJUSTMENT - 9;
-
   ctx.beginPath();
   for (let j = 0; j < 720; j++) {
     const angle_degrees = j / 2;
-    const point_rotated = placeObjectOnCicle(center, point, angle_degrees);
+    const point_rotated = Math2.apply_rotation_matrix(
+      center,
+      point,
+      angle_degrees
+    );
     ctx.moveTo(center.x, center.y);
     ctx.lineTo(point_rotated.x, point_rotated.y);
   }
@@ -125,19 +121,18 @@ const drawTicks = (
   for (let i = 0; i <= num_ticks; i++) {
     if (i == 0 || i % TICKS_LABELS_MULT == 0) {
       p2.y = center.y - center.y * 0.21;
-      ctx.lineWidth = center.x * 0.014;
+      ctx.lineWidth = center.x * 0.01;
     } else {
       p2.y = center.y - center.y * 0.26;
-      ctx.lineWidth = center.x * 0.01;
+      ctx.lineWidth = center.x * 0.005;
     }
 
     const percentage = i / num_ticks;
     const rotation = percentage * MAX_ROTATION + ROTARTION_ADJUSTMENT;
 
-    const p1_on_circle = placeObjectOnCicle(center, p1, rotation);
-    const p2_on_circle = placeObjectOnCicle(center, p2, rotation);
+    const p1_on_circle = Math2.apply_rotation_matrix(center, p1, rotation);
+    const p2_on_circle = Math2.apply_rotation_matrix(center, p2, rotation);
 
-    // ctx.fillStyle = "#a328d9";
     ctx.strokeStyle = "#8156be";
 
     // ctx.beginPath();
@@ -201,7 +196,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   ctx.lineCap = "round";
 
   // Rotate pointer
-  rotateObject(ctx, new Vec2(c_x, c_y), rotation_deg);
+  Canvans2.rotateCanvans(ctx, new Vec2(c_x, c_y), rotation_deg);
 
   // Draw awrrow outline
   ctx.beginPath();
@@ -286,7 +281,7 @@ const draw = (ctx: CanvasRenderingContext2D) => {
 
   const min_val = 0;
   const max_val = 100;
-  const value = 88;
+  const value = 67;
 
   drawBackground(ctx);
   drawTicks(ctx, min_val, max_val);
