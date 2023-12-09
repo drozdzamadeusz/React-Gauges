@@ -271,7 +271,7 @@ const draw = (ctx: CanvasRenderingContext2D) => {
   const heat_start_ang = calculatePointerRotation(0, 0, 1);
   const heat = new HeatScale(ctx, center, {
     radius_min: center.x * 0.676,
-    radius_max: center.x * 0.742,
+    radius_max: center.x * 0.743,
     angle_min: 0,
     angle_max: heat_end_angle - heat_start_ang + center.x * 0.001,
     rot_ofst: heat_start_ang - center.x * 0.001,
