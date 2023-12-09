@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import './Gauge.css';
 import { Vec2, Canvans2, Math2 } from '../../libs';
+import HeatScale from '../../classes/heatScale';
 
 const HEIHGT = 800;
 const WIDTH = HEIHGT;
 
 let MAX_ROTATION = 300;
-let ROTARTION_ADJUSTMENT = (360 - MAX_ROTATION) / 2;
+let ROT_GAP_OFST = (360 - MAX_ROTATION) / 2; //30
+let ROT_OFST = 90; //Render starting from the bottom
 
 let MAX_NUM_LABELS = 20;
 let TICKS_LABELS_MULT = 3;
@@ -56,11 +58,11 @@ const drawScaleLabels = (ctx: CanvasRenderingContext2D, val_min: number, val_max
 
   for (let i = 0; i <= num_labels; i++) {
     const percentage = i / num_labels;
-    const rotation = percentage * MAX_ROTATION + ROTARTION_ADJUSTMENT;
+    const rotation = percentage * MAX_ROTATION + ROT_GAP_OFST;
 
     const label_val = Math.round(percentage * (val_max - val_min) + val_min);
 
-    const lett_on_circle_pos = Math2.apply_rotation_matrix(center, lett_pos, rotation);
+    const lett_on_circle_pos = Math2.apply_rotation(center, lett_pos, rotation);
 
     ctx.save();
 
@@ -82,7 +84,7 @@ const drawBackground = (ctx: CanvasRenderingContext2D) => {
   ctx.beginPath();
   for (let j = 0; j < 720; j++) {
     const angle_degrees = j / 2;
-    const point_rotated = Math2.apply_rotation_matrix(center, point, angle_degrees);
+    const point_rotated = Math2.apply_rotation(center, point, angle_degrees);
     ctx.moveTo(center.x, center.y);
     ctx.lineTo(point_rotated.x, point_rotated.y);
   }
@@ -94,7 +96,7 @@ const drawBackground = (ctx: CanvasRenderingContext2D) => {
 const drawTicks = (ctx: CanvasRenderingContext2D, val_min: number, val_max: number) => {
   const center = new Vec2(WIDTH / 2, HEIHGT / 2);
 
-  const p1 = new Vec2(0, center.y - center.y * 0.3);
+  const p1 = new Vec2(0, center.y - center.y * 0.32);
   const p2 = new Vec2(0, 0);
 
   const num_ticks = Math.min(MAX_NUM_TICKS, (val_max - val_min) * TICKS_LABELS_MULT);
@@ -109,12 +111,13 @@ const drawTicks = (ctx: CanvasRenderingContext2D, val_min: number, val_max: numb
     }
 
     const percentage = i / num_ticks;
-    const rotation = percentage * MAX_ROTATION + ROTARTION_ADJUSTMENT;
+    // If ROT_OFST is set 0 then start drawing on right axis (y=0, x=len)
+    const rotation = percentage * MAX_ROTATION + ROT_GAP_OFST + (ROT_OFST - 90);
 
-    const p1_on_circle = Math2.apply_rotation_matrix(center, p1, rotation);
-    const p2_on_circle = Math2.apply_rotation_matrix(center, p2, rotation);
+    const p1_on_circle = Math2.apply_rotation(center, p1, rotation);
+    const p2_on_circle = Math2.apply_rotation(center, p2, rotation);
 
-    ctx.strokeStyle = '#8156be';
+    ctx.strokeStyle = '#d2d2d2';
 
     // ctx.beginPath();
     // ctx.arc(p1_on_circle.x, p1_on_circle.y, center.x * 0.005, 0, 2 * Math.PI);
@@ -134,7 +137,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   const c_x = WIDTH / 2;
   const c_y = HEIHGT / 2;
 
-  const rot_offset = 180;
+  const rot_offset = 90;
   rotation_deg += rot_offset;
 
   // Height offset
@@ -233,7 +236,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
 
 const calculatePointerRotation = (val: number, val_min: number, val_max: number) => {
   const max_rotation = MAX_ROTATION;
-  const rotation_align_adjustment = ROTARTION_ADJUSTMENT;
+  const rotation_align_adjustment = ROT_GAP_OFST + ROT_OFST;
 
   const val_in_ranges = Math.min(Math.max(val, val_min), val_max);
   const in_percentage = (val_in_ranges - val_min) / (val_max - val_min);
@@ -254,13 +257,47 @@ const draw = (ctx: CanvasRenderingContext2D) => {
   ctx.fillStyle = '#ffffff';
   ctx.strokeStyle = '#a328d9';
 
+  const center = new Vec2(WIDTH / 2, HEIHGT / 2);
+
   ctx.save();
 
   const min_val = 0;
   const max_val = 100;
-  const value = 67;
+  const value = 0;
 
   drawBackground(ctx);
+
+  const heat_end_angle = calculatePointerRotation(1, 0, 1);
+  const heat_start_ang = calculatePointerRotation(0, 0, 1);
+  const heat = new HeatScale(ctx, center, {
+    radius_min: center.x * 0.676,
+    radius_max: center.x * 0.742,
+    angle_min: 0,
+    angle_max: heat_end_angle - heat_start_ang + center.x * 0.001,
+    rot_ofst: heat_start_ang - center.x * 0.001,
+    hue_min: 0,
+    hue_max: 130,
+    hue_invert: true,
+    saturation: 100,
+    lightness: 22
+  });
+  heat.draw(1, 0, 1);
+
+  const heat_2_start_ang = calculatePointerRotation(80, 0, 100);
+  const heat_2 = new HeatScale(ctx, center, {
+    radius_min: center.x * 0.51,
+    radius_max: center.x * 0.59,
+    angle_min: 0,
+    angle_max: heat_end_angle - heat_2_start_ang + center.x * 0.001,
+    rot_ofst: heat_2_start_ang - center.x * 0.001,
+    hue_min: 0,
+    hue_max: 130 * 0.2,
+    hue_invert: true,
+    saturation: 100,
+    lightness: 22
+  });
+  heat_2.draw(1, 0, 1);
+
   drawTicks(ctx, min_val, max_val);
   drawScaleLabels(ctx, min_val, max_val);
 
