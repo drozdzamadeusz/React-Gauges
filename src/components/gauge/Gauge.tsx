@@ -263,7 +263,7 @@ const draw = (ctx: CanvasRenderingContext2D) => {
 
   const min_val = 0;
   const max_val = 100;
-  const value = 0;
+  const value = 45;
 
   drawBackground(ctx);
 
