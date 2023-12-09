@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
-import "./Gauge.css";
-import { Vec2, Canvans2, Math2 } from "../../libs";
+import React, { useEffect, useRef } from 'react';
+import './Gauge.css';
+import { Vec2, Canvans2, Math2 } from '../../libs';
 
 const HEIHGT = 800;
 const WIDTH = HEIHGT;
@@ -10,21 +10,21 @@ let ROTARTION_ADJUSTMENT = (360 - MAX_ROTATION) / 2;
 
 let MAX_NUM_LABELS = 20;
 let TICKS_LABELS_MULT = 3;
-let fontSize;
 
 const findVals = () => {
   let fontSize;
   if (HEIHGT <= 150) {
-    MAX_NUM_LABELS = 20 / 2
+    MAX_NUM_LABELS = 20 / 2;
     fontSize = 16;
-  }if (HEIHGT <= 250) {
-    MAX_NUM_LABELS = 20 / 2
+  }
+  if (HEIHGT <= 250) {
+    MAX_NUM_LABELS = 20 / 2;
     fontSize = 16;
   } else if (HEIHGT <= 300) {
-    MAX_NUM_LABELS = 20 / 2
+    MAX_NUM_LABELS = 20 / 2;
     fontSize = 20;
   } else if (HEIHGT <= 400) {
-    MAX_NUM_LABELS = 20 / 2
+    MAX_NUM_LABELS = 20 / 2;
     fontSize = 30;
   } else if (HEIHGT <= 600) {
     fontSize = 30;
@@ -32,7 +32,7 @@ const findVals = () => {
     fontSize = 35;
   } else if (HEIHGT <= 700) {
     TICKS_LABELS_MULT = 2;
-    MAX_NUM_LABELS = 10
+    MAX_NUM_LABELS = 10;
     fontSize = 40;
   } else if (HEIHGT <= 800) {
     fontSize = 45;
@@ -47,12 +47,8 @@ const findVals = () => {
 const MAX_NUM_TICKS = TICKS_LABELS_MULT * MAX_NUM_LABELS;
 const FONT = `${findVals()}px 'Georgia'`;
 
-const drawScaleLabels = (
-  ctx: CanvasRenderingContext2D,
-  val_min: number,
-  val_max: number
-) => {
-  ctx.fillStyle = "#d2d2d2";
+const drawScaleLabels = (ctx: CanvasRenderingContext2D, val_min: number, val_max: number) => {
+  ctx.fillStyle = '#d2d2d2';
 
   const center = new Vec2(WIDTH / 2, HEIHGT / 2);
   const lett_pos = new Vec2(0, center.y - center.y * 0.11);
@@ -64,11 +60,7 @@ const drawScaleLabels = (
 
     const label_val = Math.round(percentage * (val_max - val_min) + val_min);
 
-    const lett_on_circle_pos = Math2.apply_rotation_matrix(
-      center,
-      lett_pos,
-      rotation
-    );
+    const lett_on_circle_pos = Math2.apply_rotation_matrix(center, lett_pos, rotation);
 
     ctx.save();
 
@@ -83,18 +75,14 @@ const drawBackground = (ctx: CanvasRenderingContext2D) => {
   const center = new Vec2(WIDTH / 2, HEIHGT / 2);
   const point = new Vec2(0, center.y);
 
-  ctx.strokeStyle = "#190828";
+  ctx.strokeStyle = '#190828';
 
   ctx.lineWidth = center.x * 0.003;
 
   ctx.beginPath();
   for (let j = 0; j < 720; j++) {
     const angle_degrees = j / 2;
-    const point_rotated = Math2.apply_rotation_matrix(
-      center,
-      point,
-      angle_degrees
-    );
+    const point_rotated = Math2.apply_rotation_matrix(center, point, angle_degrees);
     ctx.moveTo(center.x, center.y);
     ctx.lineTo(point_rotated.x, point_rotated.y);
   }
@@ -103,20 +91,13 @@ const drawBackground = (ctx: CanvasRenderingContext2D) => {
   ctx.stroke();
 };
 
-const drawTicks = (
-  ctx: CanvasRenderingContext2D,
-  val_min: number,
-  val_max: number
-) => {
+const drawTicks = (ctx: CanvasRenderingContext2D, val_min: number, val_max: number) => {
   const center = new Vec2(WIDTH / 2, HEIHGT / 2);
 
   const p1 = new Vec2(0, center.y - center.y * 0.3);
   const p2 = new Vec2(0, 0);
 
-  const num_ticks = Math.min(
-    MAX_NUM_TICKS,
-    (val_max - val_min) * TICKS_LABELS_MULT
-  );
+  const num_ticks = Math.min(MAX_NUM_TICKS, (val_max - val_min) * TICKS_LABELS_MULT);
 
   for (let i = 0; i <= num_ticks; i++) {
     if (i == 0 || i % TICKS_LABELS_MULT == 0) {
@@ -133,7 +114,7 @@ const drawTicks = (
     const p1_on_circle = Math2.apply_rotation_matrix(center, p1, rotation);
     const p2_on_circle = Math2.apply_rotation_matrix(center, p2, rotation);
 
-    ctx.strokeStyle = "#8156be";
+    ctx.strokeStyle = '#8156be';
 
     // ctx.beginPath();
     // ctx.arc(p1_on_circle.x, p1_on_circle.y, center.x * 0.005, 0, 2 * Math.PI);
@@ -141,7 +122,7 @@ const drawTicks = (
     // ctx.closePath();
     // ctx.fill();
 
-    ctx.lineCap = "round";
+    ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(p1_on_circle.x, p1_on_circle.y);
     ctx.lineTo(p2_on_circle.x, p2_on_circle.y);
@@ -190,10 +171,10 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   // Store current context before rotation
   ctx.save();
 
-  ctx.fillStyle = "#af0c32";
-  ctx.strokeStyle = "#852d2d";
+  ctx.fillStyle = '#af0c32';
+  ctx.strokeStyle = '#852d2d';
   ctx.lineWidth = c_x * 0.024;
-  ctx.lineCap = "round";
+  ctx.lineCap = 'round';
 
   // Rotate pointer
   Canvans2.rotateCanvans(ctx, new Vec2(c_x, c_y), rotation_deg);
@@ -240,7 +221,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
 
   // Draw the nail that rotates arrow
   ctx.beginPath();
-  ctx.fillStyle = "#767676";
+  ctx.fillStyle = '#767676';
   ctx.arc(c_x, c_y, c_x * 0.04, 0, 2 * Math.PI);
   ctx.closePath();
   ctx.stroke();
@@ -250,11 +231,7 @@ const drawPointer = (ctx: CanvasRenderingContext2D, rotation_deg: number) => {
   ctx.restore();
 };
 
-const calculatePointerRotation = (
-  val: number,
-  val_min: number,
-  val_max: number
-) => {
+const calculatePointerRotation = (val: number, val_min: number, val_max: number) => {
   const max_rotation = MAX_ROTATION;
   const rotation_align_adjustment = ROTARTION_ADJUSTMENT;
 
@@ -267,15 +244,15 @@ const calculatePointerRotation = (
 
 const draw = (ctx: CanvasRenderingContext2D) => {
   ctx.font = FONT;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
 
-  ctx.fillStyle = "#130417";
+  ctx.fillStyle = '#130417';
   ctx.arc(WIDTH / 2, HEIHGT / 2, WIDTH / 2, 0, 2 * Math.PI);
   ctx.fill();
 
-  ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "#a328d9";
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#a328d9';
 
   ctx.save();
 
@@ -297,14 +274,14 @@ const Gauge = () => {
 
   useEffect(() => {
     if (canvasRef.current) {
-      canvasCtxRef.current = canvasRef.current.getContext("2d");
+      canvasCtxRef.current = canvasRef.current.getContext('2d');
       const ctx = canvasCtxRef.current;
       if (ctx) draw(ctx);
     }
   }, []);
 
   return (
-    <div className="gauge">
+    <div className='gauge'>
       <canvas ref={canvasRef} height={HEIHGT} width={WIDTH}></canvas>
     </div>
   );
